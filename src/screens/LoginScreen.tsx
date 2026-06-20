@@ -7,17 +7,28 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  Alert,
 } from 'react-native';
+
+import { loginAPI } from '../services/api';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    console.log(email, password);
-    navigation.replace('Home');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
-    // API call later
+    try {
+      const data = await loginAPI(email, password);
+      console.log('Login success:', data);
+      navigation.replace('Home');
+    } catch (error: any) {
+      Alert.alert('Login Failed', error.message || 'An error occurred during login');
+    }
   };
 
   return (

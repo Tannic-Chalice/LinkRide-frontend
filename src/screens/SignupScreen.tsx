@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,23 +8,38 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 
-const SignupScreen = ({navigation}: any) => {
+import { signupAPI } from '../services/api';
+
+const SignupScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignup = () => {
-    console.log({
-      name,
-      phone,
-      email,
-      password,
-      confirmPassword,
-    });
+  const handleSignup = async () => {
+    if (!name || !phone || !email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    try {
+      const data = await signupAPI(name, phone, email, password, confirmPassword);
+      console.log('Signup success:', data);
+      Alert.alert('Success', 'Registration successful! Please login.', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') }
+      ]);
+    } catch (error: any) {
+      Alert.alert('Signup Failed', error.message || 'An error occurred during signup');
+    }
   };
 
   return (
@@ -128,7 +143,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 8,
-    color: '#444',
+    color: '#010101ff',
   },
   input: {
     backgroundColor: '#F1F1F1',
