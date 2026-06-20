@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { loginAPI } from '../services/api';
+import { saveAuthData } from '../services/storage';
 
 const LoginScreen = ({navigation}: any) => {
   const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ const LoginScreen = ({navigation}: any) => {
     try {
       const data = await loginAPI(email, password);
       console.log('Login success:', data);
+      await saveAuthData(data.accessToken, data.refreshToken, data.user);
       navigation.replace('Home');
     } catch (error: any) {
       Alert.alert('Login Failed', error.message || 'An error occurred during login');

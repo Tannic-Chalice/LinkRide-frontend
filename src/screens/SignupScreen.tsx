@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { signupAPI } from '../services/api';
+import { saveAuthData } from '../services/storage';
 
 const SignupScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
@@ -34,9 +35,15 @@ const SignupScreen = ({ navigation }: any) => {
     try {
       const data = await signupAPI(name, phone, email, password, confirmPassword);
       console.log('Signup success:', data);
-      Alert.alert('Success', 'Registration successful! Please login.', [
-        { text: 'OK', onPress: () => navigation.navigate('Login') }
-      ]);
+      
+      if (data.accessToken) {
+        await saveAuthData(data.accessToken, data.refreshToken, data.user);
+        navigation.replace('Home');
+      } else {
+        Alert.alert('Success', 'Registration successful! Please login.', [
+          { text: 'OK', onPress: () => navigation.navigate('Login') }
+        ]);
+      }
     } catch (error: any) {
       Alert.alert('Signup Failed', error.message || 'An error occurred during signup');
     }
